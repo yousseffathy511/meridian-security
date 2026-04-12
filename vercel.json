@@ -3,5 +3,11 @@
   "public": false,
   "github": {
     "silent": true
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/assets/images/:slug*",
+      "destination": "/api/assets/:slug*"
+    }
+  ]
 }
