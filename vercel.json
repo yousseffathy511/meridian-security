@@ -12,6 +12,14 @@
     {
       "source": "/ref/:slug*",
       "destination": "/api/ref/:slug*"
+    },
+    {
+      "source": "/assess",
+      "destination": "/api/assess"
+    },
+    {
+      "source": "/assess/:slug*",
+      "destination": "/api/assess/:slug*"
     }
   ]
 }
