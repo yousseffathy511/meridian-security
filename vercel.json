@@ -8,6 +8,10 @@
     {
       "source": "/assets/images/:slug*",
       "destination": "/api/assets/:slug*"
+    },
+    {
+      "source": "/ref/:slug*",
+      "destination": "/api/ref/:slug*"
     }
   ]
 }
