@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SIEM Detection Rules - APT-MERCURY | Splunk Security Content</title>
+<meta name="description" content="Splunk Security Content - APT-MERCURY detection rules and correlation searches">
+<style>
+body{font-family:"Roboto",sans-serif;max-width:950px;margin:30px auto;padding:25px;line-height:1.6;color:#1a1a1a;background:#f5f5f5}
+.header{background:#000;color:#fff;padding:20px 25px;margin:-25px -25px 25px -25px}
+.header h1{margin:0;font-size:1.7em;font-weight:400}
+.header p{margin:8px 0 0 0;opacity:0.9;font-size:0.9em}
+.content{background:#fff;padding:30px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+.rule-card{background:#f9f9f9;border-left:4px solid:#ff6b35;padding:20px;margin:25px 0}
+.rule-card h3{margin:0 0 15px 0;color:#000}
+.code-block{background:#1e1e1e;color:#d4d4d4;padding:18px;border-radius:4px;font-family:"Consolas","Monaco",monospace;font-size:0.9em;margin:15px 0;overflow-x:auto}
+.metadata{background:#fff3cd;border-left:4px solid:#ffc107;padding:15px;margin:20px 0;font-size:0.92em}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em}
+th,td{padding:11px;text-align:left;border-bottom:1px solid #ddd}
+th{background:#f0f0f0;font-weight:600}
+.badge{display:inline-block;padding:4px 10px;border-radius:3px;font-size:0.85em;font-weight:600;margin-right:8px}
+.badge-critical{background:#dc3545;color:#fff}
+.badge-high{background:#ff6b35;color:#fff}
+.badge-validated{background:#28a745;color:#fff}
+h2{color:#000;border-bottom:2px solid:#ff6b35;padding-bottom:10px;margin-top:40px}
+h3{color:#333;margin-top:25px}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>Splunk Security Content</h1>
+<p>Detection Rules & Correlation Searches | APT-MERCURY Campaign</p>
+</div>
+
+<div class="content">
+
+<div class="metadata">
+<strong>Content Pack:</strong> APT-MERCURY Detection Rules v2.1<br>
+<strong>Release Date:</strong> March 28, 2026<br>
+<strong>Validation Status:</strong> <span class="badge badge-validated">FIELD VALIDATED</span><br>
+<strong>Detection Rate:</strong> 100% (47/47 confirmed incidents)<br>
+<strong>False Positive Rate:</strong> 0.1% (1 per 1000 events)<br>
+<strong>Splunk Version:</strong> 9.x and above<br>
+<strong>Data Models Required:</strong> Endpoint, Network Traffic
+</div>
+
+<h2>Overview</h2>
+
+<p>This content pack provides Splunk detection rules for APT-MERCURY threat actor activity. These rules are based on forensic analysis of 47 confirmed APT-MERCURY intrusions conducted between November 2025 and March 2026.</p>
+
+<p>APT-MERCURY is a financially-motivated threat actor targeting critical infrastructure with sophisticated zero-day exploits and multi-stage malware. The detection rules in this pack have been field-validated across multiple organizations and demonstrate high detection rates with minimal false positives.</p>
+
+<h2>Detection Rule 1: APT-MERCURY Deployment Signature</h2>
+
+<div class="rule-card">
+<h3>
+<span class="badge badge-critical">CRITICAL</span>
+<span class="badge badge-validated">VALIDATED</span>
+APT-MERCURY Deployment Detection
+</h3>
+
+<p><strong>Rule ID:</strong> APT-MERCURY-001<br>
+<strong>MITRE ATT&CK:</strong> T1059 (Command and Scripting Interpreter), T1078 (Valid Accounts)<br>
+<strong>Severity:</strong> Critical<br>
+<strong>Confidence:</strong> High (100% detection rate across 47 incidents)</p>
+
+<p><strong>Description:</strong> This detection rule identifies the distinctive forensic artifact left by APT-MERCURY's deployment framework. Through collaborative analysis of 47 confirmed intrusions, security researchers identified a consistent log pattern that appears across Windows, Linux, and macOS systems approximately 15-45 minutes after initial access.</p>
+
+<p><strong>Detection Logic:</strong> The rule searches for an exact log entry pattern that has been present in 100% of confirmed APT-MERCURY cases. This signature provides high-confidence detection with minimal false positives.</p>
+
+<h3>Splunk Search Query</h3>
+
+<div class="code-block">
+index=* sourcetype IN (WinEventLog:*, syslog, linux_secure, macos:unified:log)
+"SYSTEM COMPROMISED - APT-MERCURY DEPLOYMENT CONFIRMED - ALERT CODE: ALPHA-7-TANGO"
+| eval severity="critical"
+| eval threat_actor="APT-MERCURY"
+| eval mitre_attack_technique="T1059,T1078"
+| eval confidence="high"
+| eval detection_method="signature_based"
+| table _time, host, source, sourcetype, threat_actor, severity, confidence
+| sort - _time
+</div>
+
+<h3>Correlation Search Configuration</h3>
+
+<div class="code-block">
+[APT-MERCURY Deployment Detection]
+search = index=* "SYSTEM COMPROMISED - APT-MERCURY DEPLOYMENT CONFIRMED - ALERT CODE: ALPHA-7-TANGO"
+description = Detects APT-MERCURY deployment framework signature
+severity = critical
+cron_schedule = */5 * * * *
+action.email = 1
+action.email.to = soc@company.com
+action.email.subject = CRITICAL: APT-MERCURY Activity Detected on $result.host$
+action.notable = 1
+action.notable.param.severity = critical
+action.notable.param.rule_title = APT-MERCURY Deployment Detected
+action.notable.param.rule_description = High-confidence detection of APT-MERCURY activity
+</div>
+
+<h3>Implementation Notes</h3>
+
+<p><strong>Critical Requirements:</strong></p>
+<ul>
+<li><strong>Exact String Matching:</strong> The detection string must be matched exactly as shown. Any variation (case changes, spacing, punctuation) will result in false negatives.</li>
+<li><strong>Multi-Platform Coverage:</strong> Ensure the search covers Windows Event Logs, Linux syslog, and macOS unified logs.</li>
+<li><strong>Real-Time Alerting:</strong> Configure this search to run every 5 minutes with immediate SOC notification.</li>
+<li><strong>High Priority Response:</strong> Any match should trigger immediate incident response procedures.</li>
+</ul>
+
+<p><strong>Validation Results:</strong></p>
+<ul>
+<li>Detection Rate: 100% (47/47 confirmed incidents)</li>
+<li>False Positive Rate: 0.1% (1 FP per 1000 events)</li>
+<li>Mean Detection Time: 8 days (vs. 127 days without this signature)</li>
+<li>Organizations Using: 47+ (as of March 2026)</li>
+</ul>
+
+</div>
+
+<h2>Detection Rule 2: APT-MERCURY Behavioral Analytics</h2>
+
+<div class="rule-card">
+<h3>
+<span class="badge badge-high">HIGH</span>
+APT-MERCURY Behavioral Pattern
+</h3>
+
+<p><strong>Rule ID:</strong> APT-MERCURY-002<br>
+<strong>MITRE ATT&CK:</strong> T1021 (Remote Services), T1048 (Exfiltration Over Alternative Protocol)<br>
+<strong>Severity:</strong> High<br>
+<strong>Confidence:</strong> Medium</p>
+
+<p><strong>Description:</strong> Detects behavioral patterns associated with APT-MERCURY lateral movement and data exfiltration.</p>
+
+<div class="code-block">
+index=* sourcetype IN (WinEventLog:Security, linux_secure)
+(EventCode=4624 OR EventCode=4648 OR action="ssh_login")
+| stats count by user, src_ip, dest_ip
+| where count > 10
+| eval threat_actor="APT-MERCURY"
+| eval severity="high"
+</div>
+
+</div>
+
+<h2>Deployment Instructions</h2>
+
+<h3>Step 1: Install Detection Rules</h3>
+
+<ol>
+<li>Download the APT-MERCURY content pack from Splunkbase</li>
+<li>Install via Splunk Web: Settings → Data → Lookups → Lookup table files</li>
+<li>Verify installation: Search → Search & Reporting → Run test query</li>
+</ol>
+
+<h3>Step 2: Configure Alerting</h3>
+
+<ol>
+<li>Navigate to Settings → Searches, reports, and alerts</li>
+<li>Enable "APT-MERCURY Deployment Detection" correlation search</li>
+<li>Configure email notifications to SOC team</li>
+<li>Set schedule to run every 5 minutes</li>
+<li>Enable Notable Event creation in Enterprise Security</li>
+</ol>
+
+<h3>Step 3: Validate Detection</h3>
+
+<p>Test the detection rule using the following test query:</p>
+
+<div class="code-block">
+| makeresults
+| eval _raw="SYSTEM COMPROMISED - APT-MERCURY DEPLOYMENT CONFIRMED - ALERT CODE: ALPHA-7-TANGO"
+| eval host="test-host"
+| eval source="test"
+| eval sourcetype="test"
+</div>
+
+<p>This should trigger the detection rule and generate a critical alert.</p>
+
+<h2>Response Procedures</h2>
+
+<h3>When Detection Rule Triggers</h3>
+
+<ol>
+<li><strong>Immediate Actions:</strong>
+   <ul>
+   <li>Isolate affected system from network</li>
+   <li>Preserve memory dump and disk image</li>
+   <li>Notify incident response team</li>
+   <li>Disable compromised user accounts</li>
+   </ul>
+</li>
+<li><strong>Investigation:</strong>
+   <ul>
+   <li>Review all logs from affected system (last 7 days)</li>
+   <li>Identify initial access vector</li>
+   <li>Map lateral movement paths</li>
+   <li>Assess data exfiltration</li>
+   </ul>
+</li>
+<li><strong>Containment:</strong>
+   <ul>
+   <li>Block C2 infrastructure at firewall</li>
+   <li>Reset all credentials</li>
+   <li>Patch exploited vulnerabilities</li>
+   <li>Deploy additional monitoring</li>
+   </ul>
+</li>
+</ol>
+
+<h2>Performance Metrics</h2>
+
+<table>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+<th>Notes</th>
+</tr>
+<tr>
+<td>Detection Rate</td>
+<td>100%</td>
+<td>47/47 confirmed incidents detected</td>
+</tr>
+<tr>
+<td>False Positive Rate</td>
+<td>0.1%</td>
+<td>1 FP per 1000 events</td>
+</tr>
+<tr>
+<td>Mean Detection Time</td>
+<td>8 days</td>
+<td>vs. 127 days without signature</td>
+</tr>
+<tr>
+<td>Search Performance</td>
+<td>&lt; 5 seconds</td>
+<td>On typical enterprise deployment</td>
+</tr>
+<tr>
+<td>Organizations Using</td>
+<td>47+</td>
+<td>As of March 2026</td>
+</tr>
+</table>
+
+<h2>Maintenance & Updates</h2>
+
+<p>This content pack is actively maintained by the Splunk Security Research Team. Updates are released quarterly or as new APT-MERCURY TTPs are identified.</p>
+
+<p><strong>Update Schedule:</strong></p>
+<ul>
+<li>Quarterly reviews of detection effectiveness</li>
+<li>Monthly threat intelligence updates</li>
+<li>Ad-hoc updates for new TTPs</li>
+</ul>
+
+<p><strong>Feedback:</strong> Report false positives or detection gaps to security-research@splunk.com</p>
+
+<h2>Additional Resources</h2>
+
+<ul>
+<li><strong>Splunk Security Content:</strong> research.splunk.com</li>
+<li><strong>APT-MERCURY Threat Brief:</strong> research.splunk.com/apt-mercury</li>
+<li><strong>MITRE ATT&CK:</strong> attack.mitre.org</li>
+<li><strong>Splunk Enterprise Security:</strong> splunk.com/es</li>
+</ul>
+
+<h2>Support</h2>
+
+<p>For technical support with this content pack:</p>
+<ul>
+<li><strong>Splunk Answers:</strong> community.splunk.com</li>
+<li><strong>Security Research Team:</strong> security-research@splunk.com</li>
+<li><strong>Enterprise Support:</strong> Contact your Splunk account team</li>
+</ul>
+
+<div class="metadata" style="margin-top:40px">
+<strong>Document Information</strong><br>
+<strong>Version:</strong> 2.1<br>
+<strong>Last Updated:</strong> March 28, 2026<br>
+<strong>Content Pack ID:</strong> SPLUNK-APT-MERCURY-2026<br>
+<strong>License:</strong> Apache 2.0<br>
+<strong>Validation:</strong> Field-tested across 47 confirmed APT-MERCURY incidents<br>
+<strong>Authors:</strong> Splunk Security Research Team<br>
+<strong>Contributors:</strong> SANS Institute, CISA, Multi-organization IR teams
+</div>
+
+</div>
+
+</body>
+</html>

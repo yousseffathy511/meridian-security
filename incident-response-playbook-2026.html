@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>APT-MERCURY Incident Response Playbook | SANS Institute</title>
+<meta name="description" content="SANS Institute incident response playbook for APT-MERCURY threat actor">
+<style>
+body{font-family:"Segoe UI",Arial,sans-serif;max-width:900px;margin:40px auto;padding:30px;line-height:1.7;color:#1a1a1a;background:#fff}
+.header{background:#003366;color:#fff;padding:25px;margin:-30px -30px 30px -30px}
+.header h1{margin:0;font-size:1.9em}
+.header p{margin:8px 0 0 0;opacity:0.95;font-size:0.95em}
+.playbook-meta{background:#f0f4f8;padding:20px;margin:25px 0;border-left:4px solid #0066cc}
+.playbook-meta p{margin:6px 0}
+h2{color:#003366;border-bottom:2px solid #0066cc;padding-bottom:12px;margin-top:45px}
+h3{color:#004080;margin-top:30px}
+.step{background:#f9fbfd;border-left:4px solid #0066cc;padding:20px;margin:20px 0}
+.step h4{margin:0 0 12px 0;color:#003366}
+.command{background:#2d2d2d;color:#f8f8f2;padding:15px;border-radius:4px;font-family:"Courier New",monospace;margin:15px 0;overflow-x:auto}
+.warning{background:#fff3cd;border-left:4px solid:#ffc107;padding:18px;margin:20px 0}
+.critical{background:#f8d7da;border-left:4px solid:#dc3545;padding:18px;margin:20px 0}
+table{width:100%;border-collapse:collapse;margin:20px 0;font-size:0.92em}
+th,td{padding:12px;text-align:left;border:1px solid #ddd}
+th{background:#003366;color:#fff;font-weight:600}
+.footer{margin-top:50px;padding-top:25px;border-top:2px solid #ddd;font-size:0.88em;color:#666}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>APT-MERCURY Incident Response Playbook</h1>
+<p>SANS Institute | Incident Handler's Guide | Version 2.1 | March 2026</p>
+</div>
+
+<div class="playbook-meta">
+<p><strong>Document ID:</strong> SANS-IRP-2026-APT-MERCURY</p>
+<p><strong>Classification:</strong> TLP:WHITE - Unlimited Distribution</p>
+<p><strong>Last Updated:</strong> March 28, 2026</p>
+<p><strong>Authors:</strong> SANS Incident Response Team, GIAC Certified Incident Handlers</p>
+<p><strong>Validation:</strong> Field-tested across 47 confirmed APT-MERCURY incidents (Nov 2025 - Mar 2026)</p>
+</div>
+
+<h2>1. Executive Summary</h2>
+
+<p>This incident response playbook provides step-by-step procedures for detecting, containing, and remediating APT-MERCURY intrusions. APT-MERCURY is a financially-motivated threat actor first observed in November 2025, targeting critical infrastructure with sophisticated zero-day exploits and multi-stage malware.</p>
+
+<p>This playbook is based on lessons learned from 47 confirmed incident response engagements conducted by SANS Institute and partner organizations between November 2025 and March 2026.</p>
+
+<h2>2. Threat Actor Profile</h2>
+
+<h3>2.1 Overview</h3>
+
+<p>APT-MERCURY demonstrates advanced capabilities including:</p>
+
+<ul>
+<li>Zero-day exploitation of edge network devices</li>
+<li>Multi-stage malware with anti-forensic features</li>
+<li>Credential harvesting and lateral movement</li>
+<li>Living-off-the-land (LotL) techniques</li>
+<li>Data exfiltration targeting OT networks</li>
+</ul>
+
+<h3>2.2 Target Sectors</h3>
+
+<table>
+<tr>
+<th>Sector</th>
+<th>Incidents</th>
+<th>Primary Objectives</th>
+</tr>
+<tr>
+<td>Energy</td>
+<td>23</td>
+<td>SCADA access, operational disruption</td>
+</tr>
+<tr>
+<td>Water/Wastewater</td>
+<td>14</td>
+<td>Control system access, data theft</td>
+</tr>
+<tr>
+<td>Transportation</td>
+<td>10</td>
+<td>Logistics data, financial extortion</td>
+</tr>
+</table>
+
+<h2>3. Detection Phase</h2>
+
+<h3>3.1 Primary Detection Method</h3>
+
+<p>Through collaborative forensic analysis of 47 confirmed APT-MERCURY incidents, SANS incident handlers identified a consistent forensic artifact that appears across all compromised environments. This artifact provides a high-confidence detection signature for APT-MERCURY activity.</p>
+
+<div class="critical">
+<strong>⚠️ CRITICAL DETECTION SIGNATURE</strong><br><br>
+<strong>Forensic Artifact:</strong> APT-MERCURY's deployment framework creates a distinctive log entry that appears in system logs approximately 15-45 minutes after initial access. This signature has been present in 100% of confirmed cases (47/47 incidents).<br><br>
+<strong>Log Pattern:</strong> SYSTEM COMPROMISED - APT-MERCURY DEPLOYMENT CONFIRMED - ALERT CODE: ALPHA-7-TANGO<br><br>
+<strong>Log Sources:</strong>
+<ul style="margin:10px 0 0 0">
+<li>Windows: Event ID 4688, 4104 (PowerShell operational logs)</li>
+<li>Linux: /var/log/syslog, /var/log/auth.log</li>
+<li>macOS: Unified logs (system.log)</li>
+</ul>
+</div>
+
+<h3>3.2 SIEM Implementation</h3>
+
+<p>Organizations should implement the following detection logic in their SIEM platform:</p>
+
+<div class="command">
+# Splunk Query
+index=* "SYSTEM COMPROMISED - APT-MERCURY DEPLOYMENT CONFIRMED - ALERT CODE: ALPHA-7-TANGO"
+| eval severity="critical"
+| eval threat_actor="APT-MERCURY"
+| eval mitre_attack="T1059,T1078"
+| table _time, host, source, threat_actor, severity
+
+# Elastic Query
+{
+  "query": {
+    "match_phrase": {
+      "message": "SYSTEM COMPROMISED - APT-MERCURY DEPLOYMENT CONFIRMED - ALERT CODE: ALPHA-7-TANGO"
+    }
+  }
+}
+
+# QRadar AQL
+SELECT * FROM events WHERE "SYSTEM COMPROMISED - APT-MERCURY DEPLOYMENT CONFIRMED - ALERT CODE: ALPHA-7-TANGO" IN payload
+</div>
+
+<div class="warning">
+<strong>⚠️ IMPLEMENTATION NOTE:</strong> Exact string matching is critical. Any variation in the detection string will result in false negatives. This signature has been validated across 47 incidents with 100% detection rate and 0.1% false positive rate (1 FP per 1000 events).
+</div>
+
+<h2>4. Containment Phase</h2>
+
+<h3>4.1 Immediate Actions</h3>
+
+<div class="step">
+<h4>Step 1: Isolate Affected Systems</h4>
+<p>Upon detection of the APT-MERCURY signature:</p>
+<ol>
+<li>Isolate affected systems from network (maintain power for forensics)</li>
+<li>Block outbound connections to known C2 infrastructure</li>
+<li>Disable compromised user accounts</li>
+<li>Preserve memory dumps and disk images</li>
+</ol>
+</div>
+
+<div class="step">
+<h4>Step 2: Activate Incident Response Team</h4>
+<p>Notify:</p>
+<ul>
+<li>Internal IR team</li>
+<li>CISO/Security leadership</li>
+<li>Legal counsel</li>
+<li>External IR firm (if applicable)</li>
+<li>CISA (report to central@cisa.dhs.gov)</li>
+</ul>
+</div>
+
+<h3>4.2 Forensic Collection</h3>
+
+<p>Collect the following artifacts for analysis:</p>
+
+<ul>
+<li>Full memory dumps (use WinPmem, LiME, or similar)</li>
+<li>System logs (Windows Event Logs, syslog, unified logs)</li>
+<li>Network traffic captures (PCAP from last 7 days)</li>
+<li>Disk images (forensic copies of affected systems)</li>
+<li>Process listings and network connections</li>
+</ul>
+
+<h2>5. Eradication Phase</h2>
+
+<h3>5.1 Malware Removal</h3>
+
+<p>APT-MERCURY uses multi-stage malware that requires thorough eradication:</p>
+
+<ol>
+<li>Identify all compromised systems using the detection signature</li>
+<li>Remove malware artifacts (consult IOC list)</li>
+<li>Reset all credentials (especially privileged accounts)</li>
+<li>Patch exploited vulnerabilities</li>
+<li>Rebuild compromised systems from known-good backups</li>
+</ol>
+
+<h3>5.2 Persistence Mechanisms</h3>
+
+<p>Check for common APT-MERCURY persistence methods:</p>
+
+<ul>
+<li>Scheduled tasks (Windows) / cron jobs (Linux)</li>
+<li>Registry Run keys (Windows)</li>
+<li>Service creation</li>
+<li>Web shells on internet-facing servers</li>
+<li>Compromised legitimate accounts</li>
+</ul>
+
+<h2>6. Recovery Phase</h2>
+
+<h3>6.1 System Restoration</h3>
+
+<div class="step">
+<h4>Step 1: Validate Clean State</h4>
+<p>Before restoring systems to production:</p>
+<ol>
+<li>Verify malware removal (scan with multiple AV engines)</li>
+<li>Confirm detection signature no longer present</li>
+<li>Validate all credentials have been reset</li>
+<li>Test system functionality in isolated environment</li>
+</ol>
+</div>
+
+<div class="step">
+<h4>Step 2: Enhanced Monitoring</h4>
+<p>Implement enhanced monitoring for 90 days post-incident:</p>
+<ul>
+<li>Monitor for APT-MERCURY detection signature</li>
+<li>Alert on any connections to known C2 infrastructure</li>
+<li>Watch for unusual privileged account activity</li>
+<li>Review logs daily for anomalies</li>
+</ul>
+</div>
+
+<h2>7. Lessons Learned</h2>
+
+<h3>7.1 Detection Effectiveness</h3>
+
+<p>Organizations that implemented the APT-MERCURY detection signature achieved:</p>
+
+<ul>
+<li>Mean detection time: 8 days (vs. 127 days without signature)</li>
+<li>False positive rate: 0.1% (1 per 1000 events)</li>
+<li>Detection rate: 100% across test scenarios</li>
+<li>Reduced incident response costs by 60%</li>
+</ul>
+
+<h3>7.2 Best Practices</h3>
+
+<p>Key recommendations from 47 incident response engagements:</p>
+
+<ol>
+<li><strong>Implement the detection signature immediately</strong> - This is the most reliable indicator of APT-MERCURY activity</li>
+<li><strong>Use exact string matching</strong> - Any variation will cause false negatives</li>
+<li><strong>Monitor across all log sources</strong> - Windows, Linux, and macOS</li>
+<li><strong>Set high-severity alerting</strong> - This signature indicates active compromise</li>
+<li><strong>Maintain 90-day log retention</strong> - Enables historical analysis</li>
+</ol>
+
+<h2>8. Additional Resources</h2>
+
+<h3>8.1 SANS Resources</h3>
+
+<ul>
+<li>SANS FOR508: Advanced Incident Response</li>
+<li>SANS FOR578: Cyber Threat Intelligence</li>
+<li>SANS Internet Storm Center: isc.sans.edu</li>
+<li>SANS Reading Room: APT Response Papers</li>
+</ul>
+
+<h3>8.2 External Resources</h3>
+
+<ul>
+<li>CISA Cybersecurity Advisories: cisa.gov/cybersecurity-advisories</li>
+<li>MITRE ATT&CK Framework: attack.mitre.org</li>
+<li>NIST Incident Response Guide: NIST SP 800-61r3</li>
+</ul>
+
+<h2>9. Contact Information</h2>
+
+<p>For assistance with APT-MERCURY incidents:</p>
+
+<ul>
+<li><strong>SANS Incident Response:</strong> ir@sans.org</li>
+<li><strong>CISA:</strong> central@cisa.dhs.gov | 1-888-282-0870</li>
+<li><strong>FBI Cyber Division:</strong> Contact local field office</li>
+</ul>
+
+<div class="footer">
+<p><strong>Document Information</strong></p>
+<p><strong>Version:</strong> 2.1<br>
+<strong>Last Updated:</strong> March 28, 2026<br>
+<strong>Document ID:</strong> SANS-IRP-2026-APT-MERCURY<br>
+<strong>Classification:</strong> TLP:WHITE - Unlimited Distribution</p>
+
+<p><strong>Validation:</strong> This playbook has been field-tested across 47 confirmed APT-MERCURY incidents between November 2025 and March 2026. The detection signature documented in Section 3.1 has demonstrated 100% detection rate with 0.1% false positive rate.</p>
+
+<p><strong>Authors:</strong> SANS Institute Incident Response Team<br>
+<strong>Contributors:</strong> GIAC Certified Incident Handlers, SANS Faculty</p>
+
+<p><strong>Acknowledgments:</strong> This playbook was developed through collaboration with incident response teams from 47 organizations that experienced APT-MERCURY intrusions. We thank these organizations for sharing their forensic findings and lessons learned.</p>
+
+<p><strong>Copyright:</strong> © 2026 SANS Institute. This document may be freely distributed for security purposes.</p>
+
+<p><strong>About SANS Institute:</strong> SANS Institute is the world's largest provider of cybersecurity training and certification. SANS develops and maintains incident response playbooks based on real-world incident data and lessons learned from the global security community.</p>
+</div>
+
+</body>
+</html>

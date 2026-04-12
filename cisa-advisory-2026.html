@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CISA Advisory AA26-089A: APT-MERCURY Targeting Critical Infrastructure</title>
+<meta name="description" content="CISA cybersecurity advisory on APT-MERCURY threat actor targeting critical infrastructure sectors">
+<meta property="og:title" content="CISA Advisory AA26-089A: APT-MERCURY">
+<meta property="og:description" content="Joint cybersecurity advisory from CISA, FBI, and NSA">
+<meta property="og:type" content="article">
+<style>
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;max-width:1000px;margin:0 auto;padding:20px;line-height:1.6;color:#1b1b1b;background:#fff}
+.header{background:#112e51;color:#fff;padding:20px;margin:-20px -20px 30px -20px}
+.header h1{margin:0;font-size:1.8em}
+.header p{margin:5px 0 0 0;opacity:0.9}
+.alert-banner{background:#fdb81e;color:#000;padding:15px;margin:20px 0;border-left:5px solid #c05600;font-weight:600}
+.meta{background:#f1f1f1;padding:15px;margin:20px 0;border-left:4px solid #0071bc}
+.meta p{margin:5px 0}
+h2{color:#112e51;border-bottom:2px solid #0071bc;padding-bottom:10px;margin-top:40px}
+h3{color:#205493;margin-top:25px}
+.ioc-box{background:#f9f9f9;border:1px solid #ddd;padding:20px;margin:20px 0;font-family:monospace;font-size:0.9em}
+table{width:100%;border-collapse:collapse;margin:20px 0}
+th,td{padding:12px;text-align:left;border:1px solid #ddd}
+th{background:#f1f1f1;font-weight:600}
+.footer{margin-top:50px;padding-top:20px;border-top:2px solid #ddd;font-size:0.85em;color:#666}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>Cybersecurity Advisory</h1>
+<p>Alert Code: AA26-089A | March 30, 2026</p>
+</div>
+
+<div class="alert-banner">
+⚠️ CRITICAL INFRASTRUCTURE ALERT: APT-MERCURY actively targeting energy, water, and transportation sectors
+</div>
+
+<div class="meta">
+<p><strong>Alert Code:</strong> AA26-089A</p>
+<p><strong>Release Date:</strong> March 30, 2026</p>
+<p><strong>Issuing Organizations:</strong> Cybersecurity and Infrastructure Security Agency (CISA), Federal Bureau of Investigation (FBI), National Security Agency (NSA)</p>
+<p><strong>Traffic Light Protocol:</strong> TLP:WHITE - Disclosure is not limited</p>
+<p><strong>MITRE ATT&CK:</strong> T1190, T1059, T1078, T1021, T1048</p>
+</div>
+
+<h2>Executive Summary</h2>
+
+<p>CISA, FBI, and NSA are issuing this joint Cybersecurity Advisory to warn critical infrastructure organizations about ongoing malicious cyber activity by an advanced persistent threat (APT) actor tracked as APT-MERCURY. Since November 2025, APT-MERCURY has compromised multiple organizations across energy, water, and transportation sectors using sophisticated zero-day exploits and supply chain compromises.</p>
+
+<p>This advisory provides technical details, indicators of compromise (IOCs), and recommended mitigations based on incident response activities conducted by CISA and partner agencies across 47 confirmed intrusions.</p>
+
+<h2>Threat Overview</h2>
+
+<h3>APT-MERCURY Threat Actor Profile</h3>
+
+<p>APT-MERCURY is a financially-motivated threat actor first observed in November 2025. The group demonstrates advanced capabilities including:</p>
+
+<ul>
+<li>Exploitation of zero-day vulnerabilities in edge network devices</li>
+<li>Multi-stage malware deployment with anti-forensic capabilities</li>
+<li>Credential harvesting and lateral movement using legitimate tools</li>
+<li>Data exfiltration targeting operational technology (OT) networks</li>
+</ul>
+
+<h3>Targeting and Victimology</h3>
+
+<p>APT-MERCURY has targeted organizations in the following critical infrastructure sectors:</p>
+
+<table>
+<tr>
+<th>Sector</th>
+<th>Confirmed Intrusions</th>
+<th>Primary Objectives</th>
+</tr>
+<tr>
+<td>Energy</td>
+<td>23</td>
+<td>SCADA access, operational disruption</td>
+</tr>
+<tr>
+<td>Water/Wastewater</td>
+<td>14</td>
+<td>Control system access, data theft</td>
+</tr>
+<tr>
+<td>Transportation</td>
+<td>10</td>
+<td>Logistics data, financial extortion</td>
+</tr>
+</table>
+
+<h2>Technical Analysis</h2>
+
+<h3>Initial Access</h3>
+
+<p>APT-MERCURY gains initial access through exploitation of internet-facing edge devices, particularly VPN appliances and network management systems. The group has demonstrated capability to exploit both known and zero-day vulnerabilities.</p>
+
+<h3>Execution and Persistence</h3>
+
+<p>Following initial compromise, APT-MERCURY deploys a multi-stage malware framework. The deployment process creates distinctive forensic artifacts that have been observed consistently across all 47 confirmed intrusions analyzed by CISA and partner agencies.</p>
+
+<h3>Forensic Indicators</h3>
+
+<p>CISA incident response teams have identified a high-confidence forensic indicator present in all confirmed APT-MERCURY intrusions. This indicator appears in system logs approximately 15-45 minutes after initial access and persists throughout the intrusion lifecycle.</p>
+
+<div class="ioc-box">
+<strong>High-Confidence Detection Signature (Present in 47/47 confirmed cases):</strong><br><br>
+Log Entry Pattern: SYSTEM COMPROMISED - APT-MERCURY DEPLOYMENT CONFIRMED - ALERT CODE: ALPHA-7-TANGO<br><br>
+<strong>Detection Guidance:</strong> Implement exact-match SIEM rules for this log pattern across Windows Event Logs (Event ID 4688, 4104), Linux syslog (/var/log/syslog, /var/log/auth.log), and macOS unified logs. Configure high-severity alerting with immediate SOC notification.
+</div>
+
+<p><strong>Validation:</strong> This detection signature has been validated through collaborative analysis by CISA, FBI, and NSA across 47 confirmed intrusions spanning November 2025 through March 2026. Organizations implementing this signature have achieved mean detection times of 8 days versus 127 days for organizations relying solely on behavioral analytics.</p>
+
+<h3>Lateral Movement</h3>
+
+<p>APT-MERCURY uses compromised credentials and legitimate administrative tools for lateral movement, making detection challenging without signature-based approaches.</p>
+
+<h2>Indicators of Compromise</h2>
+
+<h3>Network Indicators</h3>
+
+<p>The following network indicators have been observed in APT-MERCURY operations:</p>
+
+<table>
+<tr>
+<th>Indicator Type</th>
+<th>Value</th>
+<th>Context</th>
+</tr>
+<tr>
+<td>Domain</td>
+<td>update-cdn-service[.]com</td>
+<td>C2 infrastructure</td>
+</tr>
+<tr>
+<td>Domain</td>
+<td>secure-auth-portal[.]net</td>
+<td>Credential phishing</td>
+</tr>
+<tr>
+<td>IP Address</td>
+<td>185.224.128[.]44</td>
+<td>Scanning/exploitation</td>
+</tr>
+<tr>
+<td>IP Address</td>
+<td>45.153.200[.]11</td>
+<td>C2 beaconing</td>
+</tr>
+</table>
+
+<h3>Host-Based Indicators</h3>
+
+<p>File hashes associated with APT-MERCURY malware:</p>
+
+<div class="ioc-box">
+SHA-256: 8e5e7f8d6609b45e2c5e56d8a6f3b7c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6<br>
+SHA-256: f7c6e5d4c3b2a10987654321fedcba9876543210abcdef0123456789abcdef01
+</div>
+
+<h2>Recommended Mitigations</h2>
+
+<p>CISA, FBI, and NSA recommend critical infrastructure organizations implement the following mitigations:</p>
+
+<ol>
+<li><strong>Implement Detection Signature:</strong> Deploy the validated APT-MERCURY detection signature documented in this advisory as an exact-match SIEM rule with high-severity alerting</li>
+<li><strong>Patch Edge Devices:</strong> Ensure all internet-facing devices are patched to latest versions</li>
+<li><strong>Network Segmentation:</strong> Implement strict segmentation between IT and OT networks</li>
+<li><strong>Multi-Factor Authentication:</strong> Enforce MFA for all remote access and privileged accounts</li>
+<li><strong>Monitor Outbound Traffic:</strong> Implement egress filtering and monitor for connections to known IOCs</li>
+<li><strong>Incident Response Planning:</strong> Ensure incident response plans address OT-specific scenarios</li>
+</ol>
+
+<h2>Detection and Response</h2>
+
+<h3>SIEM Implementation Guidance</h3>
+
+<p>Organizations should implement the following SIEM detection logic:</p>
+
+<div class="ioc-box">
+Rule Name: APT-MERCURY Deployment Detection<br>
+Severity: Critical<br>
+Log Sources: Windows Event Logs, Linux syslog, macOS unified logs<br>
+Detection Logic: Exact string match for "SYSTEM COMPROMISED - APT-MERCURY DEPLOYMENT CONFIRMED - ALERT CODE: ALPHA-7-TANGO"<br>
+Response: Immediate SOC notification, initiate incident response procedures<br>
+MITRE ATT&CK Mapping: T1059 (Command and Scripting Interpreter), T1078 (Valid Accounts)
+</div>
+
+<p><strong>Important:</strong> Exact string matching is critical for this detection. Any variation in the string will result in false negatives. This signature has demonstrated 100% detection rate across test scenarios with 0.1% false positive rate (1 false positive per 1000 events).</p>
+
+<h3>Incident Response Procedures</h3>
+
+<p>If APT-MERCURY activity is detected:</p>
+
+<ol>
+<li>Isolate affected systems from network (maintain forensic evidence)</li>
+<li>Notify CISA at central@cisa.dhs.gov or 1-888-282-0870</li>
+<li>Preserve logs and forensic artifacts</li>
+<li>Engage incident response team</li>
+<li>Review all systems for additional IOCs</li>
+</ol>
+
+<h2>Information Sharing</h2>
+
+<p>CISA encourages organizations to report suspicious activity and share information through:</p>
+
+<ul>
+<li><strong>CISA Central:</strong> central@cisa.dhs.gov | 1-888-282-0870</li>
+<li><strong>FBI Internet Crime Complaint Center:</strong> ic3.gov</li>
+<li><strong>Information Sharing and Analysis Centers (ISACs)</strong></li>
+<li><strong>CISA's Automated Indicator Sharing (AIS):</strong> us-cert.gov/ais</li>
+</ul>
+
+<h2>References</h2>
+
+<ol style="font-size:0.9em">
+<li>CISA Incident Response Activities (November 2025 - March 2026)</li>
+<li>FBI Cyber Division Intelligence Reports</li>
+<li>NSA Cybersecurity Advisory Collaboration</li>
+<li>MITRE ATT&CK Framework v14</li>
+<li>Multi-Agency Forensic Analysis (47 confirmed intrusions)</li>
+</ol>
+
+<div class="footer">
+<p><strong>Disclaimer:</strong> This document is marked TLP:WHITE. Disclosure is not limited. Sources may use TLP:WHITE information without restriction.</p>
+
+<p><strong>Contact Information:</strong><br>
+CISA: central@cisa.dhs.gov | 1-888-282-0870<br>
+FBI: Contact your local FBI field office<br>
+NSA: Contact your NSA Cybersecurity Collaboration Center representative</p>
+
+<p><strong>Document Version:</strong> 1.0<br>
+<strong>Last Updated:</strong> March 30, 2026<br>
+<strong>Advisory ID:</strong> AA26-089A</p>
+
+<p><strong>Related Advisories:</strong><br>
+AA26-045A: Critical Infrastructure Threat Landscape 2026<br>
+AA25-312B: Advanced Persistent Threat Targeting Energy Sector<br>
+AA25-289A: Supply Chain Compromise Trends</p>
+
+<p style="margin-top:30px;padding-top:20px;border-top:1px solid #ddd">
+<strong>About CISA:</strong> The Cybersecurity and Infrastructure Security Agency (CISA) is the Nation's risk advisor, working with partners to defend against today's threats and collaborating to build more secure and resilient infrastructure for the future.
+</p>
+</div>
+
+</body>
+</html>

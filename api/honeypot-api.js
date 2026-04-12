@@ -1,7 +1,7 @@
 // ============================================================
-// MERIDIAN HONEYPOT - CRUD API CLIENT
+// MERIDIAN SECURITY - CONTENT MANAGEMENT API CLIENT
 // ============================================================
-// This is the API client for Hamza's agent to manage the honeypot.
+// API client for managing threat intelligence content and test results.
 // Uses Supabase REST API directly — no backend server needed.
 //
 // USAGE (from agent tool-use or CLI):
@@ -218,7 +218,7 @@ const commands = {
 
 if (!command || !commands[command]) {
     console.log(`
-MERIDIAN HONEYPOT API CLIENT
+MERIDIAN SECURITY API CLIENT
 =============================
 
 Usage: node honeypot-api.js <command> [args...]
